@@ -1,0 +1,136 @@
+h1, h2, h3, h4 {
+    font-family: Arial, sans-serif; 
+    font-weight: bold; 
+    color: #333; 
+    margin-bottom: 10px; 
+}
+
+h1 {
+    font-size: 24px; 
+}
+
+h2 {
+    font-size: 20px; 
+    text-align: center; 
+}
+
+
+h3 {
+    font-size: 18px; 
+}
+
+h4 {
+    font-size: 16px; 
+    text-align: center;
+}
+
+//* Logo
+
+img {
+    width: 150px; 
+    height: auto; 
+    display: block; 
+    margin: 0 auto;
+}
+
+// Navegacion
+header {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    padding: 20px; 
+    background-color: $secondary-color; 
+}
+
+// Estilos para el título
+h1 {
+    margin: 0; 
+    font-size: 24px; // Tamaño de fuente del h1
+}
+
+// Estilos para el logo
+img {
+    width: 200px; 
+    height: auto; 
+}
+
+// Estilos para la navegación 
+nav {
+    ul {
+        list-style-type: none; 
+        margin: 0; 
+        padding: 0; 
+        text-align: right; 
+    }
+
+    li {
+        display: inline-block;
+        margin-left: 20px; 
+    }
+
+    a {
+        color: $dark-color; 
+        font-size: 20px; 
+    }
+}
+
+//* Body
+body {
+    background-color: $primary-color; 
+}
+
+
+
+.banner-img {
+    width: 100%; /* Ajusta el ancho al 100% del contenedor */
+    height: auto; /* Permite que la altura se ajuste automáticamente */
+    display: block; /* Hace que la imagen sea un elemento de bloque */
+    margin: 0 auto; /* Centra la imagen horizontalmente */
+}
+
+// Formulario Registrate
+
+.formulario {
+    text-align: center;
+    margin-top: 20px; 
+}
+
+div {
+    margin-bottom: 10px; 
+}
+
+input[type="text"] {
+    width: 300px; 
+    padding: 5px; 
+    margin-top: 5px; 
+}
+
+input[type="email"] {
+    width: 300px; 
+    padding: 5px; 
+    margin-top: 5px; 
+}
+
+input[type="password"] {
+    width: 300px;
+    padding: 5px; 
+    margin-top: 5px; 
+}
+
+label {
+    display: block;
+}
+
+input[type="submit"] {
+    padding: 10px 20px; 
+    background-color: $muted-color; 
+    color: $light-color; 
+    border: none; 
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+input[type="submit"]:hover {
+    background-color: $secondary-color; 
+}
+

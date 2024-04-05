@@ -1,0 +1,28 @@
+
+.botones-ppal {
+    display: flex; 
+    flex-direction: column; 
+    align-items: flex-end; 
+    margin-top: 30px; 
+}
+
+.botones-ppal button {
+    width: 200px; 
+    height: 50px; 
+}
+
+.botones-ppal button {
+    margin-bottom: 20px; 
+    font-size: 20px; 
+    background-color: $muted-color; 
+    color: $light-color; 
+    border: none; 
+    padding: 10px 20px; 
+    border-radius: 5px; 
+    cursor: pointer; 
+}
+
+.botones-ppal button:hover {
+    background-color: $medium-color; 
+}
+

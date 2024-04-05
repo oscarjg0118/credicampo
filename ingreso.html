@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credicampo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Credicampo </h1>
+        <img src="img/Logo-CrediCampo2-2.png" alt="Logo">
+        <nav>
+            <ul>
+                <li><a href="index.html" target="_self">Inicio</a></li>
+                <li><a href="solicitaCredit.html">Solicita tu Crédito</a></li>
+                <li><a href="productservicios.html">Productos y Servicios</a></li>
+                <li><a href="pagos.html">Pagos</a></li>
+                <li><a href="#nosotros">Nosotros</a></li>
+                <li><a href="#ayuda">Ayuda</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="formulario">
+            <h2>Ingresa tus Datos</h2>
+            <form method="post">
+                <div class="text">
+                    <input type="text" placeholder="Usuario" required>
+                </div>
+                <div class="text">
+                    <input type="password" name="Contraseña" value= "placeholder="Contraseña>
+                </div>
+                <a href="recuperacontrase.html" class="recordar">¿Olvidó su Contraseña?</a>
+                <input type="submit" value="Ingresa">
+            </form>
+        </div>
+        <div>
+            <script>
+                document.querySelector('form').addEventListener('submit', function(event) {
+                    var usuario = document.querySelector('input[type="text"]').value;
+                    var contraseña = document.querySelector('input[type="password"]').value;
+            
+                    if (!usuario || !contraseña) {
+                        alert('Por favor ingresa tu usuario y contraseña.');
+                        event.preventDefault(); // Evita que se envíe el formulario
+                    }
+                });
+            </script>
+        </div>
+
+        <div>
+            <script>
+                src="./node_modules/bootstrap/dist/js/bootstrap.min.js"
+            </script>
+        </div>
+
+    <footer>
+        <p>© 2024 Credicampo - Todos los derechos reservados</p>
+    </footer>
+</body>
+</html>
+
+
+
+
+
+
+
+
+

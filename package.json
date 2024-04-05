@@ -1,0 +1,17 @@
+{
+  "name": "credicampo",
+  "version": "1.0.0",
+  "description": "Proyecto con HTML-SASS-PYTHON",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "HTML-SASS"
+  ],
+  "author": "Oscar J Gonzalez D",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^5.3.3"
+  }
+}
