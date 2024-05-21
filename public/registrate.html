@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credicampo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Credicampo </h1>
+        <img src="img/Logo-CrediCampo2-2.png" alt="Logo">
+        <nav>
+            <ul>
+                <li><a href="index.html" target="_self">Inicio</a></li>
+                <li><a href="solicitaCredit.html">Solicita tu Crédito</a></li>
+                <li><a href="#productos-servicios">Productos y Servicios</a></li>
+                <li><a href="#pagos">Pagos</a></li>
+                <li><a href="#nosotros">Nosotros</a></li>
+                <li><a href="#ayuda">Ayuda</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="formulario">
+            <h2>Registra tus Datos</h2>
+            <form id="registerForm">
+                <div class="nombres">
+                    <input type="text" id="nombres" name="nombres" placeholder="Nombres" required>
+                </div>
+                <div class="apellidos">
+                    <input type="text" id="apellidos" name="apellidos" placeholder="Apellidos" required>
+                </div>
+                <div class="direccion">
+                    <input type="text" id="direccion" name="direccion" placeholder="Direccion" required>
+                </div>
+                <div class="ciudad">
+                    <input type="text" id="ciudad" name="ciudad" placeholder="Ciudad" required>
+                </div>
+                <div class="email">
+                    <input type="email" id="email" name="email" placeholder="Correo Electronico" required>
+                </div>
+                <input type="submit" value="Registrarse">
+            </form>
+            <p id="message"></p>
+        </div>
+    </main>
+    <div>
+        <script src="node_modules/react/umd/react.development.js"></script>
+        <script src="node_modules/react-dom/umd/react-dom.development.js"></script>
+        <script src="node_modules/babel-standalone/babel.js"></script>
+        <script type="text/babel">
+            const { useState } = React;
+
+            function Register() {
+                const [nombres, setNombres] = useState('');
+                const [apellidos, setApellidos] = useState('');
+                const [direccion, setDireccion] = useState('');
+                const [ciudad, setCiudad] = useState('');
+                const [email, setEmail] = useState('');
+                const [message, setMessage] = useState('');
+
+                const handleSubmit = async (e) => {
+                    e.preventDefault();
+                    try {
+                        const response = await fetch('http://localhost/backend/api/register.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                nombres,
+                                apellidos,
+                                direccion,
+                                ciudad,
+                                email
+                            })
+                        });
+                        const data = await response.json();
+                        setMessage(data.message);
+                    } catch (error) {
+                        setMessage('Error al registrar usuario.');
+                    }
+                };
+
+                return (
+                    <div className="formulario">
+                        <h2>Registra tus Datos</h2>
+                        <form onSubmit={handleSubmit}>
+                            <div className="nombres">
+                                <input 
+                                    type="text" 
+                                    placeholder="Nombres" 
+                                    value={nombres}
+                                    onChange={(e) => setNombres(e.target.value)} 
+                                    required 
+                                />
+                            </div>
+                            <div className="apellidos">
+                                <input 
+                                    type="text" 
+                                    placeholder="Apellidos" 
+                                    value={apellidos}
+                                    onChange={(e) => setApellidos(e.target.value)} 
+                                    required 
+                                />
+                            </div>
+                            <div className="direccion">
+                                <input 
+                                    type="text" 
+                                    placeholder="Direccion" 
+                                    value={direccion}
+                                    onChange={(e) => setDireccion(e.target.value)} 
+                                    required 
+                                />
+                            </div>
+                            <div className="ciudad">
+                                <input 
+                                    type="text" 
+                                    placeholder="Ciudad" 
+                                    value={ciudad}
+                                    onChange={(e) => setCiudad(e.target.value)} 
+                                    required 
+                                />
+                            </div>
+                            <div className="email">
+                                <input 
+                                    type="email" 
+                                    placeholder="Correo Electronico" 
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)} 
+                                    required 
+                                />
+                            </div>
+                            <input type="submit" value="Registrarse" />
+                        </form>
+                        {message && <p>{message}</p>}
+                    </div>
+                );
+            }
+
+            ReactDOM.render(<Register />, document.getElementById('registerForm'));
+        </script>
+    </div>
+
+    <footer>
+        <p>© 2024 Credicampo - Todos los derechos reservados</p>
+    </footer>
+</body>
+</html>
