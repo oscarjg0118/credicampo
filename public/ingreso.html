@@ -29,7 +29,7 @@
                     <input type="text" placeholder="Usuario" required>
                 </div>
                 <div class="text">
-                    <input type="password" name="Contraseña" value= "placeholder="Contraseña>
+                    <input type="password" name="Contraseña" placeholder="Contraseña" required>
                 </div>
                 <a href="recuperacontrase.html" class="recordar">¿Olvidó su Contraseña?</a>
                 <input type="submit" value="Ingresa">
@@ -48,18 +48,16 @@
                 });
             </script>
         </div>
-
-        <div>
-            <script>
-                src="./node_modules/bootstrap/dist/js/bootstrap.min.js"
-            </script>
-        </div>
-
+        <div id="root"></div>
+        <script src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="ingreso.bundle.js"></script> <!-- Webpack añadirá esto automáticamente -->
+    </main>
     <footer>
         <p>© 2024 Credicampo - Todos los derechos reservados</p>
     </footer>
 </body>
 </html>
+
 
 
 

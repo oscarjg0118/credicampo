@@ -40,6 +40,14 @@
                 <div class="email">
                     <input type="email" id="email" name="email" placeholder="Correo Electronico" required>
                 </div>
+                <!-- Campo de contraseña -->
+                <div class="password">
+                    <input type="password" id="password" name="password" placeholder="Contraseña" required>
+                </div>
+                <!-- Campo de confirmación de contraseña -->
+                <div class="password-confirm">
+                    <input type="password" id="password-confirm" name="password-confirm" placeholder="Confirmar Contraseña" required>
+                </div>
                 <input type="submit" value="Registrarse">
             </form>
             <p id="message"></p>
@@ -58,10 +66,16 @@
                 const [direccion, setDireccion] = useState('');
                 const [ciudad, setCiudad] = useState('');
                 const [email, setEmail] = useState('');
+                const [password, setPassword] = useState('');
+                const [passwordConfirm, setPasswordConfirm] = useState(''); // Nuevo estado para la confirmación de contraseña
                 const [message, setMessage] = useState('');
 
                 const handleSubmit = async (e) => {
                     e.preventDefault();
+                    if (password !== passwordConfirm) {
+                        setMessage('Las contraseñas no coinciden');
+                        return;
+                    }
                     try {
                         const response = await fetch('http://localhost/backend/api/register.php', {
                             method: 'POST',
@@ -73,7 +87,8 @@
                                 apellidos,
                                 direccion,
                                 ciudad,
-                                email
+                                email,
+                                password
                             })
                         });
                         const data = await response.json();
@@ -132,6 +147,26 @@
                                     required 
                                 />
                             </div>
+                            {/* Campo de contraseña */}
+                            <div className="password">
+                                <input 
+                                    type="password" 
+                                    placeholder="Contraseña" 
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)} 
+                                    required 
+                                />
+                            </div>
+                            {/* Campo de confirmación de contraseña */}
+                            <div className="password-confirm">
+                                <input 
+                                    type="password" 
+                                    placeholder="Confirmar Contraseña" 
+                                    value={passwordConfirm}
+                                    onChange={(e) => setPasswordConfirm(e.target.value)} 
+                                    required 
+                                />
+                            </div>
                             <input type="submit" value="Registrarse" />
                         </form>
                         {message && <p>{message}</p>}
@@ -142,7 +177,9 @@
             ReactDOM.render(<Register />, document.getElementById('registerForm'));
         </script>
     </div>
-
+    <div id="root"></div>
+    <script src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="ingreso.bundle.js"></script>
     <footer>
         <p>© 2024 Credicampo - Todos los derechos reservados</p>
     </footer>
