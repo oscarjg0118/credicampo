@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Credicampo</title>
     <link rel="stylesheet" href="styles.css">
-</head>
+<script defer src="registrate.bundle.js"></script></head>
 <body>
     <header>
         <h1>Credicampo</h1>
@@ -24,14 +24,12 @@
     <main>
         <div id="root"></div> <!-- Aquí se montará el componente de React -->
     </main>
-    <!-- Usa la ruta /static para los archivos de React -->
-    <script src="/static/react/umd/react.development.js"></script>
-    <script src="/static/react-dom/umd/react-dom.development.js"></script>
-    <script src="/static/babel-standalone/babel.js"></script>
+    <script src="node_modules/react/umd/react.development.js"></script>
+    <script src="node_modules/react-dom/umd/react-dom.development.js"></script>
+    <script src="node_modules/babel-standalone/babel.js"></script>
     <script type="text/babel" src="registrate.js"></script>
     <footer>
         <p>© 2024 Credicampo - Todos los derechos reservados</p>
     </footer>
 </body>
 </html>
-

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credicampo</title>
+    <link rel="stylesheet" href="styles.css">
+<script defer src="pagos.bundle.js"></script></head>
+<body>
+    <header>
+        <h1>Credicampo </h1>
+        <img src="img/Logo-CrediCampo2-2.png" alt="Logo">
+        <nav>
+            <ul>
+                <li><a href="index.html" target="_self">Inicio</a></li>
+                <li><a href="solicitaCredit.html">Solicita tu Crédito</a></li>
+                <li><a href="productservicios.html">Productos y Servicios</a></li>                
+                <li><a href="#nosotros">Nosotros</a></li>
+                <li><a href="#ayuda">Ayuda</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="formulario">
+            <h2>Realiza el Pago de tus Productos</h2>
+            <form method="post">
+                <div class="idproducto1">
+                    <input type="text" placeholder="Digita el numero de Obligacion" required>
+                </div>
+                <div class="idproducto2">
+                    <input type="text" placeholder="Confirmar numero de Obligacion" required>
+                </div>
+                <div class="documento">
+                    <input type="text" placeholder="Numero de Documento" required>
+                </div>
+                <div class="valorpago">
+                    <input type="text" placeholder="valor a Pagar  $" required>
+                </div>
+                <input type="submit" value="Cancelar">
+                <input type="submit" value="Continuar">                
+            </form>
+            </div>
+        </div>
+    </main> 
+
+    <div>
+        <script>
+            src="./node_modules/bootstrap/dist/js/bootstrap.min.js"
+        </script>
+    </div>
+    <div id="root"></div>
+    <script src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="ingreso.bundle.js"></script>
+    <footer>
+        <p>© 2024 Credicampo - Todos los derechos reservados</p>
+    </footer>
+</body>
+</html>
