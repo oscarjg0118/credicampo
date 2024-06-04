@@ -20,11 +20,15 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Verificar la conexión
 if ($conn->connect_error) {
-    die(json_encode(["message" => "Connection failed: " . $conn->connect_error]));
+    echo json_encode(["message" => "Connection failed: " . $conn->connect_error]);
+    http_response_code(500);
+    exit();
 }
 
 // Obtener los datos de la solicitud
-$data = json_decode(file_get_contents("php://input"), true);
+$rawData = file_get_contents("php://input");
+echo $rawData;
+$data = json_decode($rawData, true);
 
 // Log para verificar los datos recibidos
 error_log(print_r($data, true));
