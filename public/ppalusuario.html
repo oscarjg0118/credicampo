@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credicampo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Credicampo</h1>
+        <img src="img/Logo-CrediCampo2-2.png" alt="Logo">
+        <nav>
+            <ul>
+                <li><a href="solicitaCredit.html">Solicita tu Producto</a></li>
+                <li><a href="productservicios.html">Productos y Servicios</a></li>
+                <li><a href="pagos.html">Pagos</a></li>
+                <li><a href="#nosotros">Nosotros</a></li>
+                <li><a href="#ayuda">Ayuda</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="botones-ppal">
+        <button type="button" id="logoutButton">Salir del sistema</button>
+        <img src="img/banner-ppal1.jpg" alt="imagen banner ppal" class="banner-img">
+    </main>
+
+    <div id="root"></div>
+
+    <div>
+        <script src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="bundle.js"></script> <!-- Añadir esta línea para cargar el bundle -->
+        <script>
+            document.getElementById("logoutButton").addEventListener("click", function() {
+                // Aquí puedes añadir funcionalidad para cerrar la sesión, como eliminar cookies o tokens de sesión
+                alert("Sesión cerrada exitosamente.");
+                window.location.href = "ingreso.html"; // Redirigir al usuario a la página de inicio de sesión
+            });
+        </script>
+    </div>
+
+    <footer>
+        <p>© 2024 Credicampo - Todos los derechos reservados</p>
+    </footer>
+
+    <script src="/static/react/umd/react.development.js"></script>
+    <script src="/static/react-dom/umd/react-dom.development.js"></script>
+    <script src="/static/babel-standalone/babel.js"></script>
+    <script type="text/babel" src="ppalusuario.js"></script>
+</body>
+</html>
+
+

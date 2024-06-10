@@ -18,26 +18,16 @@ class RegisterTest extends TestCase
 
     private function setInputData(array $data)
     {
-        // Simular el contenido de php://input
+        // Encode data to JSON format
         $jsonData = json_encode($data);
 
-        // Crear un stream temporal para php://input
-        $stream = fopen('php://memory', 'r+');
-        fwrite($stream, $jsonData);
-        rewind($stream);
-
-        // Reemplazar php://input con nuestro stream temporal
-        global $php_input;
-        $php_input = $stream;
-
-        // Ajustar las variables globales del servidor para simular la solicitud
-        $_SERVER['CONTENT_TYPE'] = 'application/json';
-        $_SERVER['REQUEST_METHOD'] = 'POST';
+        // Write JSON data to php://input
+        file_put_contents('php://input', $jsonData);
     }
 
     public function testValidInputData()
     {
-        // Simulamos datos de entrada válidos
+        // Simulate valid input data
         $inputData = [
             'nombres' => 'John',
             'apellidos' => 'Doe',
@@ -49,50 +39,58 @@ class RegisterTest extends TestCase
             'clave' => 'password123',
         ];
 
-        // Simulamos la solicitud HTTP POST
+        // Set Content-Type header
+        header('Content-Type: application/json');
+
+        // Simulate HTTP POST request
         $this->setInputData($inputData);
 
-        // Verificar los datos que se están enviando
+        // Verify sent data
         error_log("Input data sent: " . json_encode($inputData));
 
-        // Incluir el archivo a probar
+        // Include file to test
         include '../../backend/api/register.php';
 
-        // Capturar la salida
+        // Capture output
         $output = ob_get_clean();
+        ob_start(); // Restart buffer for next test
 
-        // Verificar si hay errores en la respuesta
+        // Check for errors in response
         error_log("Server response: " . $output);
 
-        // Verificamos que la respuesta sea la esperada
+        // Verify expected response
         $responseData = json_decode($output, true);
         $this->assertEquals('Usuario registrado correctamente', $responseData['message']);
     }
 
     public function testMissingInputData()
     {
-        // Simulamos datos de entrada faltantes
+        // Simulate missing input data
         $inputData = [
             'nombres' => 'John',
-            // Otros campos faltantes
+            // Other missing fields
         ];
 
-        // Simulamos la solicitud HTTP POST
+        // Set Content-Type header
+        header('Content-Type: application/json');
+
+        // Simulate HTTP POST request
         $this->setInputData($inputData);
 
-        // Verificar los datos que se están enviando
+        // Verify sent data
         error_log("Input data sent: " . json_encode($inputData));
 
-        // Incluir el archivo a probar
+        // Include file to test
         include '../../backend/api/register.php';
 
-        // Capturar la salida
+        // Capture output
         $output = ob_get_clean();
+        ob_start(); // Restart buffer for next test
 
-        // Verificar si hay errores en la respuesta
+        // Check for errors in response
         error_log("Server response: " . $output);
 
-        // Verificamos que se devuelva un mensaje de error
+        // Verify error message
         $responseData = json_decode($output, true);
         $this->assertEquals('Todos los campos son obligatorios', $responseData['message']);
     }

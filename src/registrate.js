@@ -13,6 +13,7 @@ function Register() {
   const [clave, setClave] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,7 +33,7 @@ function Register() {
       clave,
     };
 
-    console.log(JSON.stringify(userData)); // Agregar este log para verificar los datos
+    setIsLoading(true); // Activar el estado de carga
 
     try {
       const response = await fetch(
@@ -54,6 +55,8 @@ function Register() {
       }
     } catch (error) {
       setMessage("Error al registrar usuario.");
+    } finally {
+      setIsLoading(false); // Desactivar el estado de carga
     }
   };
 
@@ -142,8 +145,9 @@ function Register() {
             required
           />
         </div>
-        <input type="submit" value="Registrarse" />
+        <input type="submit" value="Registrarse" disabled={isLoading} />
       </form>
+      {isLoading && <p>Cargando...</p>}
       {message && <p>{message}</p>}
     </div>
   );

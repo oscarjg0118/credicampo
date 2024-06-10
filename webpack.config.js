@@ -8,6 +8,7 @@ module.exports = {
     ingreso: "./src/ingreso.js",
     registrate: "./src/registrate.js",
     pagos: "./src/pagos.js",
+    ppalusuario: "./src/ppalusuario.js",
   },
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -68,6 +69,11 @@ module.exports = {
       template: "./public/pagos.html",
       chunks: ["pagos"],
       filename: "pagos.html",
+    }),
+    new HtmlWebpackPlugin({
+      template: "./public/ppalusuario.html",
+      chunks: ["ppalusuario"],
+      filename: "ppalusuario.html",
     }),
   ],
 };
