@@ -28,27 +28,12 @@ if ($conn->connect_error) {
 // Obtener los datos de la solicitud
 $rawData = file_get_contents("php://input");
 
-// Log para verificar los datos crudos recibidos
-error_log("Raw data received: " . $rawData);
-error_log("Raw data length: " . strlen($rawData));
-error_log("Content-Type header: " . $_SERVER['CONTENT_TYPE']);
-error_log("Request method: " . $_SERVER['REQUEST_METHOD']);
-
 // Decodificar los datos JSON
 try {
     $data = json_decode($rawData, true);
 } catch (Exception $e) {
     error_log('Error al decodificar JSON: ' . $e->getMessage());
     echo json_encode(['message' => 'Error al decodificar los datos JSON']);
-    http_response_code(400);
-    exit();
-}
-
-// Log para verificar los datos decodificados
-error_log(print_r($data, true));
-
-if (json_last_error() !== JSON_ERROR_NONE) {
-    echo json_encode(["message" => "Error en el formato de los datos JSON"]);
     http_response_code(400);
     exit();
 }
@@ -63,50 +48,72 @@ $email = $data['email'] ?? null;
 $celular = $data['celular'] ?? null;
 $clave = $data['clave'] ?? null;
 
-error_log("Antes de la validación de datos:");
-error_log("Nombres: " . ($nombres ?? 'NULL'));
-error_log("Apellidos: " . ($apellidos ?? 'NULL'));
-error_log("Documento: " . ($documento ?? 'NULL'));
-error_log("Dirección: " . ($direccion ?? 'NULL'));
-error_log("Ciudad: " . ($ciudad ?? 'NULL'));
-error_log("Email: " . ($email ?? 'NULL'));
-error_log("Celular: " . ($celular ?? 'NULL'));
-error_log("Clave: " . ($clave ?? 'NULL'));
-
 if (!$nombres || !$apellidos || !$documento || !$direccion || !$ciudad || !$email || !$celular || !$clave) {
     echo json_encode(["message" => "Todos los campos son obligatorios"]);
     http_response_code(400);
     exit();
 }
 
-error_log("Después de la validación de datos:");
-error_log("Nombres: " . ($nombres ?? 'NULL'));
-error_log("Apellidos: " . ($apellidos ?? 'NULL'));
-error_log("Documento: " . ($documento ?? 'NULL'));
-error_log("Dirección: " . ($direccion ?? 'NULL'));
-error_log("Ciudad: " . ($ciudad ?? 'NULL'));
-error_log("Email: " . ($email ?? 'NULL'));
-error_log("Celular: " . ($celular ?? 'NULL'));
-error_log("Clave: " . ($clave ?? 'NULL'));
+// Verificar si el documento ya está registrado
+$sql_documento = "SELECT * FROM usuarios WHERE documento = ?";
+$stmt_documento = $conn->prepare($sql_documento);
+$stmt_documento->bind_param("s", $documento);
+$stmt_documento->execute();
+$result_documento = $stmt_documento->get_result();
+$stmt_documento->close();
+
+if ($result_documento->num_rows > 0) {
+    echo json_encode(["message" => "Documento ya Registrado, por favor Confirmar"]);
+    http_response_code(400);
+    exit();
+}
+
+// Verificar si el correo electrónico ya está registrado
+$sql_email = "SELECT * FROM usuarios WHERE email = ?";
+$stmt_email = $conn->prepare($sql_email);
+$stmt_email->bind_param("s", $email);
+$stmt_email->execute();
+$result_email = $stmt_email->get_result();
+$stmt_email->close();
+
+if ($result_email->num_rows > 0) {
+    echo json_encode(["message" => "Correo electrónico ya Registrado, por favor Confirmar"]);
+    http_response_code(400);
+    exit();
+}
+
+// Verificar si el celular ya está registrado
+$sql_celular = "SELECT * FROM usuarios WHERE celular = ?";
+$stmt_celular = $conn->prepare($sql_celular);
+$stmt_celular->bind_param("s", $celular);
+$stmt_celular->execute();
+$result_celular = $stmt_celular->get_result();
+$stmt_celular->close();
+
+if ($result_celular->num_rows > 0) {
+    echo json_encode(["message" => "Celular ya Registrado, por favor Confirmar"]);
+    http_response_code(400);
+    exit();
+}
 
 // Encriptar la contraseña
 $clave_hashed = password_hash($clave, PASSWORD_DEFAULT);
 
 // Insertar los datos en la base de datos
-$sql = "INSERT INTO usuarios (nombres, apellidos, documento, direccion, ciudad, email, celular, clave, fecha_registro) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("ssssssss", $nombres, $apellidos, $documento, $direccion, $ciudad, $email, $celular, $clave_hashed);
+$sql_insert = "INSERT INTO usuarios (nombres, apellidos, documento, direccion, ciudad, email, celular, clave, fecha_registro) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+$stmt_insert = $conn->prepare($sql_insert);
+$stmt_insert->bind_param("ssssssss", $nombres, $apellidos, $documento, $direccion, $ciudad, $email, $celular, $clave_hashed);
 
 $response = array();
 
-if ($stmt->execute()) {
+if ($stmt_insert->execute()) {
     $response['message'] = "Usuario registrado correctamente";
 } else {
-    $response['message'] = "Error al registrar usuario: " . $stmt->error;
+    $response['message'] = "Error al registrar usuario: " . $stmt_insert->error;
     http_response_code(500);
 }
 
-$stmt->close();
+$stmt_insert->close();
 $conn->close();
 
 echo json_encode($response);
