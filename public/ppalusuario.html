@@ -12,18 +12,21 @@
         <img src="img/Logo-CrediCampo2-2.png" alt="Logo">
         <nav>
             <ul>
-                <li><a href="solicitaCredit.html">Solicita tu Producto</a></li>
-                <li><a href="productservicios.html">Productos y Servicios</a></li>
-                <li><a href="pagos.html">Pagos</a></li>
-                <li><a href="#nosotros">Nosotros</a></li>
-                <li><a href="#ayuda">Ayuda</a></li>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="solicitaCredit.html">Mis Cuentas Ahorro</a></li>
+                <li><a href="productservicios.html">Mis Creditos</a></li>
+                <li><a href="productservicios.html">Transferencias</a></li>
+                <li><a href="pagos.html">Pagos</a></li>                
             </ul>
         </nav>
     </header>
 
     <main class="botones-ppal">
+        <div id="userInfo">
+            <!-- Aquí se mostrará el nombre del usuario -->
+        </div>
         <button type="button" id="logoutButton">Salir del sistema</button>
-        <img src="img/banner-ppal1.jpg" alt="imagen banner ppal" class="banner-img">
+        <!-- <img src="img/banner-ppal1.jpg" alt="imagen banner ppal" class="banner-img"> -->
     </main>
 
     <div id="root"></div>
@@ -32,8 +35,17 @@
         <script src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
         <script src="bundle.js"></script> <!-- Añadir esta línea para cargar el bundle -->
         <script>
+            // Recuperar el email del usuario desde sessionStorage
+            const userEmail = sessionStorage.getItem("userEmail");
+            if (userEmail) {
+                document.getElementById("userInfo").innerText = "Bienvenido, " + userEmail;
+            } else {
+                document.getElementById("userInfo").innerText = "No se ha iniciado sesión.";
+            }
+
             document.getElementById("logoutButton").addEventListener("click", function() {
                 // Aquí puedes añadir funcionalidad para cerrar la sesión, como eliminar cookies o tokens de sesión
+                sessionStorage.removeItem("userEmail"); // Eliminar el email del sessionStorage
                 alert("Sesión cerrada exitosamente.");
                 window.location.href = "ingreso.html"; // Redirigir al usuario a la página de inicio de sesión
             });
@@ -50,5 +62,6 @@
     <script type="text/babel" src="ppalusuario.js"></script>
 </body>
 </html>
+
 
 
