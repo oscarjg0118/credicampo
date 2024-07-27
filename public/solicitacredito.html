@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credicampo - Solicitud de Crédito</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Credicampo</h1>
+        <img src="img/Logo-CrediCampo2-2.png" alt="Logo">
+        <nav>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="solicitaCredit.html">Mis Cuentas Ahorro</a></li>
+                <li><a href="productservicios.html">Transferencias</a></li>
+                <li><a href="pagos.html">Pagos</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="botones-ppal">
+        <div id="userInfo">
+            <!-- Aquí se mostrará el nombre del usuario -->
+        </div>
+        <button type="button" id="logoutButton">Salir del sistema</button>
+    </main>
+
+    <!-- React renderiza el formulario aquí -->
+    <div id="root"></div>
+
+    <footer>
+        <p>© 2024 Credicampo - Todos los derechos reservados</p>
+    </footer>
+    
+    <!-- Incluye los scripts de React y Babel -->
+    <script src="/static/react/umd/react.development.js"></script>
+    <script src="/static/react-dom/umd/react-dom.development.js"></script>
+    <script src="/static/babel-standalone/babel.js"></script>
+    
+    <!-- Incluye tu componente React -->
+    <script type="text/babel" src="solicitacredito.js"></script>
+</body>
+</html>
+
+
+
+

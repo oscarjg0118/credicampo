@@ -9,6 +9,7 @@ module.exports = {
     registrate: "./src/registrate.js",
     pagos: "./src/pagos.js",
     ppalusuario: "./src/ppalusuario.js",
+    solicitacredito: "./src/solicitacredito.js",
   },
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -74,6 +75,11 @@ module.exports = {
       template: "./public/ppalusuario.html",
       chunks: ["ppalusuario"],
       filename: "ppalusuario.html",
+    }),
+    new HtmlWebpackPlugin({
+      template: "./public/solicitacredito.html",
+      chunks: ["solicitacredito"],
+      filename: "solicitacredito.html",
     }),
   ],
 };

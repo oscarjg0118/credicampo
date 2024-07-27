@@ -3,59 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Credicampo</title>
+    <title>Solicitud de Crédito - Credicampo</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
-        <h1>Credicampo </h1>
-        <img src="img/Logo-CrediCampo2-2.png" alt="Logo">
-        <nav>
-            <ul>
-                <li><a href="index.html" target="_self">Inicio</a></li>               
-                <li><a href="productservicios.html">Productos y Servicios</a></li>
-                <li><a href="pagos.html">Pagos</a></li>
-                <li><a href="#nosotros">Nosotros</a></li>
-                <li><a href="#ayuda">Ayuda</a></li>
-            </ul>
-        </nav>
+        <h1>Solicitud de Crédito</h1>
     </header>
-    <main>
-    <div class="formulario">
-        <h2>Solicitud de Credito</h2>
-            <form method="post">
-                <div class="nombres">
-                    <input type="text" placeholder="Nombres" required>
-                </div>
-                <div class="apellidos">
-                    <input type="text" placeholder="Apellidos" required>
-                </div>
-                <div class="documento">
-                    <input type="text" placeholder="Documento de Identidad" required>
-                </div>
-                <div class="email">
-                    <input type="email" placeholder="Correo Electronico" required>
-                </div>
-                <div class="direccion">
-                    <input type="text" placeholder="Direccion" required>
-                </div>
-                <div class="monto">
-                    <input type="text" placeholder="Monto Solicitado" required>
-                </div>
-                <input type="submit" value="Enviar">
-            </form>
-            </div>
-        </div>
-    </main> 
 
-    <div>
-        <script>
-            src="./node_modules/bootstrap/dist/js/bootstrap.min.js"
-        </script>
-    </div>
+    <main>
+        <form id="creditoForm">
+            <div>
+                <label for="monto">Monto solicitado:</label>
+                <input type="number" id="monto" name="monto" required>
+            </div>
+
+            <div>
+                <label for="ingreso">Ingreso mensual:</label>
+                <input type="number" id="ingreso" name="ingreso" required>
+            </div>
+
+            <div>
+                <label for="plazo">Plazo en meses:</label>
+                <select id="plazo" name="plazo">
+                    <option value="12">12 meses</option>
+                    <option value="24">24 meses</option>
+                    <option value="36">36 meses</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="cuota">Cuota mensual estimada:</label>
+                <input type="text" id="cuota" name="cuota" readonly>
+            </div>
+
+            <button type="submit">Solicitar Crédito</button>
+        </form>
+    </main>
 
     <footer>
         <p>© 2024 Credicampo - Todos los derechos reservados</p>
     </footer>
+
+    <script src="solicitacredito.js"></script>
 </body>
 </html>
