@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import "./styles/styles.scss";
 
@@ -9,6 +9,18 @@ function SolicitudCredito() {
   const [interesMensual, setInteresMensual] = useState(0.5); // Interés mensual del 0.5% por defecto
   const [cuotaMensual, setCuotaMensual] = useState(null);
   const [resultado, setResultado] = useState("");
+  const [usuarioId, setUsuarioId] = useState(null);
+
+  useEffect(() => {
+    const userId = sessionStorage.getItem("userId");
+    console.log("userId from sessionStorage:", userId); // Log para depuración
+    if (!userId) {
+      alert("Debe iniciar sesión para solicitar un crédito.");
+      window.location.href = "ingreso.html"; // Redirigir a la página de inicio de sesión si no está logueado
+    } else {
+      setUsuarioId(userId);
+    }
+  }, []);
 
   const calcularCuota = () => {
     const tasaInteresMensual = interesMensual / 100;
@@ -48,6 +60,7 @@ function SolicitudCredito() {
             plazo: plazo,
             interesMensual: interesMensual, // Asegúrate de enviar el interés mensual
             cuota: cuotaMensual, // Campo "cuota" en lugar de "cuotaMensual"
+            usuario_id: usuarioId, // Enviar el usuario_id como parte del cuerpo de la solicitud
           }),
         }
       );

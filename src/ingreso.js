@@ -27,7 +27,8 @@ function Ingreso() {
       const data = await response.json();
       if (data.success) {
         setMessage("Ingreso exitoso");
-        sessionStorage.setItem("userEmail", email); // Guardar el email en sessionStorage
+        sessionStorage.setItem("userEmail", data.userEmail); // Guardar el email en sessionStorage
+        sessionStorage.setItem("userId", data.userId); // Guardar el userId en sessionStorage
         window.location.href = "ppalusuario.html"; // Redirigir a la página de inicio
       } else {
         setMessage("Error: " + data.message);

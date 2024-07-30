@@ -39,7 +39,7 @@ if (!$email || !$clave) {
 }
 
 // Consulta para verificar las credenciales en la base de datos
-$sql = "SELECT * FROM usuarios WHERE email = ?";
+$sql = "SELECT id, email, clave FROM usuarios WHERE email = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $email);
 $stmt->execute();
@@ -50,7 +50,7 @@ if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
     if (password_verify($clave, $row['clave'])) {
         // Contraseña válida, iniciar sesión
-        echo json_encode(["success" => true]);
+        echo json_encode(["success" => true, "userId" => $row['id'], "userEmail" => $row['email']]);
     } else {
         // Contraseña incorrecta
         echo json_encode(["success" => false, "message" => "Contraseña incorrecta"]);
