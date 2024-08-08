@@ -25,7 +25,7 @@ if (!$userId) {
     exit();
 }
 
-$sql = "SELECT id, monto, plazo, cuota_mensual FROM solicitudes_credito WHERE usuario_id = ?";
+$sql = "SELECT id, monto, plazo, interes_mensual, cuota_mensual FROM solicitudes_credito WHERE usuario_id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userId);
 $stmt->execute();

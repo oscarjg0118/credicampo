@@ -20,12 +20,23 @@ function Pagos() {
     )
       .then((response) => response.json())
       .then((data) => {
+        console.log("Solicitudes obtenidas:", data);
         setSolicitudes(data);
       })
       .catch((error) => {
         console.error("Error al obtener las solicitudes de crédito:", error);
       });
   }, []);
+
+  const calcularAbonos = (monto, interesMensual, valor) => {
+    const interesGenerado = monto * (interesMensual / 100);
+    const abonoIntereses = Math.min(valor, interesGenerado);
+    const abonoCapital = Math.max(0, valor - abonoIntereses);
+    const saldoCapital = Math.max(0, monto - abonoCapital);
+    const saldoIntereses = Math.max(0, interesGenerado - abonoIntereses);
+
+    return { abonoIntereses, abonoCapital, saldoCapital, saldoIntereses };
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -36,39 +47,75 @@ function Pagos() {
       return;
     }
 
-    const saldoCapital = Math.max(0, solicitud.monto - valorPago);
-    const abonoCapital =
-      valorPago > solicitud.monto ? solicitud.monto : valorPago;
-    const abonoIntereses =
-      valorPago > solicitud.monto ? valorPago - solicitud.monto : 0;
+    console.log("Solicitud seleccionada:", solicitud);
 
-    const data = {
-      solicitud_id: obligacionId,
-      valor_transaccion: parseFloat(valorPago),
-      abono_capital: parseFloat(abonoCapital),
-      abono_intereses: parseFloat(abonoIntereses),
-      saldo_capital: parseFloat(saldoCapital),
-      saldo_intereses: parseFloat(solicitud.cuota_mensual - abonoIntereses),
-    };
+    const valor = parseFloat(valorPago);
+    const monto = parseFloat(solicitud.monto);
+    const interesMensual = parseFloat(solicitud.interes_mensual);
+    const plazo = parseInt(solicitud.plazo, 10);
+    const cuotaMensual = parseFloat(solicitud.cuota_mensual);
 
-    console.log("Datos enviados:", data); // Añadido para depuración
+    console.log("Valores ingresados:");
+    console.log("Valor a pagar:", valor);
+    console.log("Monto:", monto);
+    console.log("Interés mensual:", interesMensual);
+    console.log("Plazo:", plazo);
 
-    fetch("http://localhost/backend/api/registrarPago.php", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Respuesta del servidor:", data);
-        alert(data.message || "Pago registrado exitosamente.");
+    if (
+      isNaN(valor) ||
+      valor <= 0 ||
+      isNaN(monto) ||
+      monto <= 0 ||
+      isNaN(interesMensual) ||
+      interesMensual <= 0 ||
+      isNaN(plazo) ||
+      plazo <= 0
+    ) {
+      const errorMessage =
+        "Error en los cálculos. Por favor revise que los valores ingresados sean números válidos y mayores que cero.";
+      console.error(errorMessage);
+      alert(errorMessage);
+      return;
+    }
+
+    try {
+      const { abonoIntereses, abonoCapital, saldoCapital, saldoIntereses } =
+        calcularAbonos(monto, interesMensual, valor);
+
+      const data = {
+        solicitud_id: obligacionId,
+        fecha: new Date().toISOString(), // Fecha actual
+        valor_transaccion: valor,
+        abono_capital: abonoCapital,
+        abono_intereses: abonoIntereses,
+        saldo_capital: saldoCapital,
+        saldo_intereses: saldoIntereses,
+      };
+
+      console.log("Datos enviados:", data);
+
+      fetch("http://localhost/backend/api/registrarPago.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
       })
-      .catch((error) => {
-        console.error("Error al registrar el pago:", error);
-        alert("Error al registrar el pago.");
-      });
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Respuesta del servidor:", data);
+          alert(data.message || "Pago registrado exitosamente.");
+        })
+        .catch((error) => {
+          console.error("Error al registrar el pago:", error);
+          alert("Error al registrar el pago.");
+        });
+    } catch (error) {
+      console.error(error);
+      alert(
+        "Error al calcular los abonos. Por favor, revise los valores ingresados."
+      );
+    }
   };
 
   return (
@@ -88,7 +135,8 @@ function Pagos() {
             {solicitudes.map((solicitud) => (
               <option key={solicitud.id} value={solicitud.id}>
                 {solicitud.id} - Monto: {solicitud.monto} - Plazo:{" "}
-                {solicitud.plazo} meses - Cuota Mensual:{" "}
+                {solicitud.plazo} meses - Interés Mensual:{" "}
+                {solicitud.interes_mensual}%: Cuota Mensual{" "}
                 {solicitud.cuota_mensual}
               </option>
             ))}
@@ -102,6 +150,8 @@ function Pagos() {
             className="form-control"
             value={valorPago}
             onChange={(e) => setValorPago(e.target.value)}
+            min="0.01"
+            step="0.01"
             required
           />
         </div>
