@@ -33,7 +33,7 @@ $fecha = date("Y-m-d H:i:s");
 // Datos de conexión a la base de datos
 $servername = "localhost:3307";
 $username = "root";
-$password = "123456";
+$password = "";
 $dbname = "credicampo1";
 
 // Crear la conexión

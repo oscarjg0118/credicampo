@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
-import "./styles/styles.scss";
+import "/public/styles.scss";
 
 function SolicitudCredito() {
   const [monto, setMonto] = useState(0);
@@ -10,10 +10,10 @@ function SolicitudCredito() {
   const [cuotaMensual, setCuotaMensual] = useState(null);
   const [resultado, setResultado] = useState("");
   const [usuarioId, setUsuarioId] = useState(null);
+  const [cupo, setCupo] = useState(null); // Nuevo estado para almacenar el cupo
 
   useEffect(() => {
     const userId = sessionStorage.getItem("userId");
-    console.log("userId from sessionStorage:", userId); // Log para depuración
     if (!userId) {
       alert("Debe iniciar sesión para solicitar un crédito.");
       window.location.href = "ingreso.html"; // Redirigir a la página de inicio de sesión si no está logueado
@@ -22,12 +22,37 @@ function SolicitudCredito() {
     }
   }, []);
 
+  // Función para calcular la cuota mensual con el método de amortización francesa
   const calcularCuota = () => {
-    const tasaInteresMensual = interesMensual / 100;
+    const TN = interesMensual / 100; // Tasa nominal en decimal
+    const n = plazo; // Plazo en meses
+
+    // Aplicar la fórmula de amortización francesa
     const cuota =
-      (monto * tasaInteresMensual) /
-      (1 - Math.pow(1 + tasaInteresMensual, -plazo));
-    setCuotaMensual(Math.round(cuota)); // Redondear la cuota a la cantidad entera más cercana
+      (monto * TN * Math.pow(1 + TN, n)) / (Math.pow(1 + TN, n) - 1);
+
+    // Redondear la cuota a la cantidad entera más cercana
+    setCuotaMensual(Math.round(cuota));
+  };
+
+  // Función para asignar el cupo basado en los ingresos
+  const asignarCupo = () => {
+    if (ingreso <= 2000000) {
+      setCupo(1200000);
+    } else {
+      setCupo(1900000);
+    }
+  };
+
+  // Función para limpiar el formulario
+  const limpiarFormulario = () => {
+    setMonto(0);
+    setIngreso(0);
+    setPlazo(12);
+    setInteresMensual(0.5);
+    setCuotaMensual(null);
+    setResultado("");
+    setCupo(null);
   };
 
   const handleSubmit = async (event) => {
@@ -39,6 +64,12 @@ function SolicitudCredito() {
       return;
     }
 
+    // Validar que el monto no sea mayor al cupo asignado
+    if (monto > cupo) {
+      alert("El monto solicitado excede el cupo disponible.");
+      return;
+    }
+
     if (cuotaMensual === null) {
       alert(
         "Por favor, calcule la cuota mensual antes de enviar la solicitud."
@@ -46,7 +77,11 @@ function SolicitudCredito() {
       return;
     }
 
+    // Asignar el cupo antes de enviar la solicitud
+    asignarCupo();
+
     try {
+      // Enviar la solicitud de crédito
       const response = await fetch(
         "http://localhost/backend/api/solicitacredito.php",
         {
@@ -58,9 +93,11 @@ function SolicitudCredito() {
             monto: monto,
             ingreso: ingreso,
             plazo: plazo,
-            interesMensual: interesMensual, // Asegúrate de enviar el interés mensual
-            cuota: cuotaMensual, // Campo "cuota" en lugar de "cuotaMensual"
-            usuario_id: usuarioId, // Enviar el usuario_id como parte del cuerpo de la solicitud
+            interesMensual: interesMensual,
+            cuota: cuotaMensual,
+            usuario_id: usuarioId,
+            estado: "creado", // Agregar el campo estado con valor 'creado'
+            cupo: cupo, // Enviar el valor del cupo asignado
           }),
         }
       );
@@ -145,7 +182,15 @@ function SolicitudCredito() {
         <button type="submit" className="btn btn-primary">
           Enviar Solicitud
         </button>
+        <button
+          type="button"
+          className="btn btn-warning ml-2"
+          onClick={limpiarFormulario}
+        >
+          Limpiar
+        </button>
       </form>
+
       <div id="resultado" className="mt-3">
         {resultado}
       </div>

@@ -8,29 +8,32 @@
 </head>
 <body>
     <header>
-        <h1>Credicampo </h1>
+        <h1>Credicampo</h1>
         <img src="img/Logo-CrediCampo2-2.png" alt="Logo">
         <nav>
             <ul>
                 <li><a href="ppalusuario.html" target="_self">Inicio</a></li>
-                <li><a href="solicitacredito.html">Solicitud de Credito</a></li>
-                <li><a href="productservicios.html">Productos y Servicios</a></li>                
                 <li><a href="#nosotros">Nosotros</a></li>
                 <li><a href="#ayuda">Ayuda</a></li>
             </ul>
         </nav>
     </header>
-    <main>
-        <div id="root"></div>
-    </main> 
+    <main> 
+        <div id="root">
+            <h2>Tus Créditos</h2>
+            <div id="creditList">
+                <!-- Aquí se mostrarán los créditos cargados por JavaScript -->
+            </div>
+            <button type="button" id="logoutButton">Salir del sistema</button>
+        </div>
+    </main>
 
     <footer>
         <p>© 2024 Credicampo - Todos los derechos reservados</p>
     </footer>
 
     <script src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="pagos.bundle.js"></script>
+    <script src="miscreditos.bundle.js"></script>
 </body>
 </html>
-
 

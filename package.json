@@ -15,6 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "@babel/standalone": "^7.24.6",
+    "babel-standalone": "^6.26.0",
     "bootstrap": "^5.3.3",
     "express": "^4.19.2",
     "react": "^18.3.1",

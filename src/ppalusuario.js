@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
-import "./styles/styles.scss";
+import "/public/styles.scss";
 
 function PpalUsuario() {
   useEffect(() => {

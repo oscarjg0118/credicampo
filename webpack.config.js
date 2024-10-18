@@ -10,6 +10,8 @@ module.exports = {
     pagos: "./src/pagos.js",
     ppalusuario: "./src/ppalusuario.js",
     solicitacredito: "./src/solicitacredito.js",
+    ctaahorro: "./src/ctaahorro.js",
+    miscreditos: "./src/miscreditos.js",
   },
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -55,6 +57,16 @@ module.exports = {
       template: "./public/index.html",
       chunks: ["index"],
       filename: "index.html",
+    }),
+    new HtmlWebpackPlugin({
+      template: "./public/miscreditos.html",
+      chunks: ["miscreditos"],
+      filename: "miscreditos.html",
+    }),
+    new HtmlWebpackPlugin({
+      template: "./public/ctaahorro.html",
+      chunks: ["ctaahorro"],
+      filename: "ctaahorro.html",
     }),
     new HtmlWebpackPlugin({
       template: "./public/ingreso.html",

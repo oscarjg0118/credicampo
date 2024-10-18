@@ -6,7 +6,7 @@ header("Content-Type: application/json; charset=UTF-8");
 
 $servername = "localhost:3307";
 $username = "root";
-$password = "123456";
+$password = "";
 $dbname = "credicampo1";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
