@@ -42,18 +42,48 @@ $id_cuenta_ahorro = $data->id_cuenta_ahorro;
 $monto_transferencia = $data->monto_transferencia;
 $id_credito = $data->id_credito;
 
+// Verificar el estado del crédito
+$sql_check = "SELECT estado FROM solicitudes_credito WHERE id = ?";
+$stmt_check = $conn->prepare($sql_check);
+$stmt_check->bind_param("i", $id_credito);
+$stmt_check->execute();
+$result_check = $stmt_check->get_result();
+
+if ($result_check->num_rows === 0) {
+    echo json_encode(["success" => false, "message" => "Crédito no encontrado"]);
+    http_response_code(404);
+    exit();
+}
+
+$row = $result_check->fetch_assoc();
+if ($row['estado'] === 'desembolsado') {
+    echo json_encode(["success" => false, "message" => "El crédito ya ha sido desembolsado"]);
+    http_response_code(400);
+    exit();
+}
+
 // Iniciar una transacción para asegurar integridad de datos
 $conn->begin_transaction();
 
 try {
-    // 1. Copiar el valor de monto_transferencia a valor_movimiento en ctaahorro y actualizar saldo_actual
+    // 1. Obtener el saldo actual de la cuenta de ahorro
+    $sql_get_saldo = "SELECT saldo_actual FROM ctaahorro WHERE id = ?";
+    $stmt_get_saldo = $conn->prepare($sql_get_saldo);
+    $stmt_get_saldo->bind_param("i", $id_cuenta_ahorro);
+    $stmt_get_saldo->execute();
+    $result_saldo = $stmt_get_saldo->get_result();
+    $row_saldo = $result_saldo->fetch_assoc();
+    $saldo_actual = $row_saldo['saldo_actual'];
+
+    // 2. Insertar el movimiento en ctaahorro y actualizar saldo_actual
+    $nuevo_saldo = $saldo_actual + $monto_transferencia;
     $sql1 = "INSERT INTO ctaahorro (usuario_id, tipo_movimiento, valor_movimiento, saldo_actual, fecha_movimiento)
              VALUES (?, 'transferencia', ?, ?, NOW())";
     $stmt1 = $conn->prepare($sql1);
-    $stmt1->bind_param("idd", $usuario_id, $monto_transferencia, $monto_transferencia);
+    $stmt1->bind_param("idd", $usuario_id, $monto_transferencia, $nuevo_saldo);
     $stmt1->execute();
 
-    // 2. Actualizar el estado de la solicitud de crédito a "desembolsado"
+    // 3. Actualizar el estado de la solicitud de crédito a "desembolsado"
     $sql2 = "UPDATE solicitudes_credito SET estado = 'desembolsado', saldo_capital = 0 WHERE id = ?";
     $stmt2 = $conn->prepare($sql2);
     $stmt2->bind_param("i", $id_credito);
@@ -71,6 +101,8 @@ try {
 }
 
 // Cerrar conexiones
+$stmt_check->close();
+$stmt_get_saldo->close();
 $stmt1->close();
 $stmt2->close();
 $conn->close();

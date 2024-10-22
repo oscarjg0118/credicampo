@@ -66,8 +66,14 @@ function App() {
       return;
     }
 
+    // Verificar si el crédito ya está desembolsado
+    if (selectedCredito.estado === "desembolsado") {
+      alert("No se puede transferir un crédito que ya ha sido desembolsado.");
+      return;
+    }
+
     const { monto, id: id_credito } = selectedCredito;
-    const { id: id_cuenta_ahorro } = selectedCuentaAhorro;
+    const { id: id_cuenta_ahorro, saldo_actual } = selectedCuentaAhorro;
 
     if (
       confirm(
@@ -75,14 +81,6 @@ function App() {
       )
     ) {
       setIsCopying(true);
-
-      // Depuración: Verificar los datos que se van a enviar
-      console.log({
-        usuario_id: userId,
-        id_cuenta_ahorro: id_cuenta_ahorro,
-        monto_transferencia: monto,
-        id_credito: id_credito,
-      });
 
       fetch("http://localhost/backend/api/transferirCreditoACuentaAhorro.php", {
         method: "POST",
@@ -100,7 +98,9 @@ function App() {
           if (!response.ok) {
             return response.json().then((data) => {
               throw new Error(
-                `Error HTTP: ${response.status}. ${data.message}`
+                `Error HTTP: ${response.status}. ${
+                  data?.message || "Ocurrió un error."
+                }`
               );
             });
           }
@@ -109,11 +109,20 @@ function App() {
         .then((data) => {
           if (data.success) {
             alert("Monto transferido con éxito a la cuenta de ahorro.");
+            // Actualizar el estado del crédito a desembolsado
             setCreditos((prevCreditos) =>
               prevCreditos.map((credito) =>
                 credito.id === id_credito
                   ? { ...credito, estado: "desembolsado" }
                   : credito
+              )
+            );
+            // Sumar el monto al saldo de la cuenta de ahorro
+            setCuentasAhorro((prevCuentas) =>
+              prevCuentas.map((cuenta) =>
+                cuenta.id === id_cuenta_ahorro
+                  ? { ...cuenta, saldo_actual: cuenta.saldo_actual + monto }
+                  : cuenta
               )
             );
           } else {
@@ -158,11 +167,13 @@ function App() {
               }
             >
               <option value="">Seleccione un crédito</option>
-              {creditos.map((credito) => (
-                <option key={credito.id} value={credito.id}>
-                  Crédito ID: {credito.id} - Monto: ${credito.monto}
-                </option>
-              ))}
+              {creditos
+                .filter((credito) => credito.estado !== "desembolsado")
+                .map((credito) => (
+                  <option key={credito.id} value={credito.id}>
+                    Crédito ID: {credito.id} - Monto: ${credito.monto}
+                  </option>
+                ))}
             </select>
           )}
 

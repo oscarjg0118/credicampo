@@ -10,7 +10,6 @@ function SolicitudCredito() {
   const [cuotaMensual, setCuotaMensual] = useState(null);
   const [resultado, setResultado] = useState("");
   const [usuarioId, setUsuarioId] = useState(null);
-  const [cupo, setCupo] = useState(null); // Nuevo estado para almacenar el cupo
 
   useEffect(() => {
     const userId = sessionStorage.getItem("userId");
@@ -35,15 +34,6 @@ function SolicitudCredito() {
     setCuotaMensual(Math.round(cuota));
   };
 
-  // Función para asignar el cupo basado en los ingresos
-  const asignarCupo = () => {
-    if (ingreso <= 2000000) {
-      setCupo(1200000);
-    } else {
-      setCupo(1900000);
-    }
-  };
-
   // Función para limpiar el formulario
   const limpiarFormulario = () => {
     setMonto(0);
@@ -52,7 +42,6 @@ function SolicitudCredito() {
     setInteresMensual(0.5);
     setCuotaMensual(null);
     setResultado("");
-    setCupo(null);
   };
 
   const handleSubmit = async (event) => {
@@ -64,21 +53,12 @@ function SolicitudCredito() {
       return;
     }
 
-    // Validar que el monto no sea mayor al cupo asignado
-    if (monto > cupo) {
-      alert("El monto solicitado excede el cupo disponible.");
-      return;
-    }
-
     if (cuotaMensual === null) {
       alert(
         "Por favor, calcule la cuota mensual antes de enviar la solicitud."
       );
       return;
     }
-
-    // Asignar el cupo antes de enviar la solicitud
-    asignarCupo();
 
     try {
       // Enviar la solicitud de crédito
@@ -97,7 +77,6 @@ function SolicitudCredito() {
             cuota: cuotaMensual,
             usuario_id: usuarioId,
             estado: "creado", // Agregar el campo estado con valor 'creado'
-            cupo: cupo, // Enviar el valor del cupo asignado
           }),
         }
       );
