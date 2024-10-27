@@ -4,12 +4,13 @@ import "/public/styles.scss";
 
 function App() {
   const [creditos, setCreditos] = useState([]);
-  const [cuentasAhorro, setCuentasAhorro] = useState([]);
+  const [cuentaAhorro, setCuentaAhorro] = useState(null); // Cambiado a solo una cuenta de ahorro
   const [selectedCredito, setSelectedCredito] = useState(null);
   const [selectedCuentaAhorro, setSelectedCuentaAhorro] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isCopying, setIsCopying] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const userId = sessionStorage.getItem("userId");
 
@@ -40,7 +41,28 @@ function App() {
       });
   }, [userId]);
 
-  // Fetch para obtener las cuentas de ahorro
+  // Fetch para obtener los créditos
+  useEffect(() => {
+    fetch(
+      `http://localhost/backend/api/obtenerSolicitudesCredito.php?userId=${userId}`
+    )
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Error HTTP: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setCreditos(Array.isArray(data) ? data : []);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        setError(error.message);
+        setIsLoading(false);
+      });
+  }, [userId]);
+
+  // Fetch para obtener la cuenta de ahorro más reciente
   useEffect(() => {
     fetch(`http://localhost/backend/api/obtenerctaahorro.php?userId=${userId}`)
       .then((response) => {
@@ -50,7 +72,7 @@ function App() {
         return response.json();
       })
       .then((data) => {
-        setCuentasAhorro(Array.isArray(data) ? data : []);
+        setCuentaAhorro(data || null); // Guarda solo la última cuenta de ahorro obtenida
         setIsLoading(false);
       })
       .catch((error) => {
@@ -61,19 +83,18 @@ function App() {
 
   // Función para copiar el monto del crédito a la cuenta de ahorro
   const transferirMonto = () => {
-    if (!selectedCredito || !selectedCuentaAhorro) {
+    if (!selectedCredito || !cuentaAhorro) {
       alert("Debe seleccionar un crédito y una cuenta de ahorro.");
       return;
     }
 
-    // Verificar si el crédito ya está desembolsado
     if (selectedCredito.estado === "desembolsado") {
       alert("No se puede transferir un crédito que ya ha sido desembolsado.");
       return;
     }
 
     const { monto, id: id_credito } = selectedCredito;
-    const { id: id_cuenta_ahorro, saldo_actual } = selectedCuentaAhorro;
+    const { id: id_cuenta_ahorro, saldo_actual } = cuentaAhorro;
 
     if (
       confirm(
@@ -109,7 +130,6 @@ function App() {
         .then((data) => {
           if (data.success) {
             alert("Monto transferido con éxito a la cuenta de ahorro.");
-            // Actualizar el estado del crédito a desembolsado
             setCreditos((prevCreditos) =>
               prevCreditos.map((credito) =>
                 credito.id === id_credito
@@ -117,14 +137,10 @@ function App() {
                   : credito
               )
             );
-            // Sumar el monto al saldo de la cuenta de ahorro
-            setCuentasAhorro((prevCuentas) =>
-              prevCuentas.map((cuenta) =>
-                cuenta.id === id_cuenta_ahorro
-                  ? { ...cuenta, saldo_actual: cuenta.saldo_actual + monto }
-                  : cuenta
-              )
-            );
+            setCuentaAhorro((prevCuenta) => ({
+              ...prevCuenta,
+              saldo_actual: prevCuenta.saldo_actual + monto,
+            }));
           } else {
             alert("Error al transferir el monto: " + data.message);
           }
@@ -135,6 +151,16 @@ function App() {
         })
         .finally(() => setIsCopying(false));
     }
+  };
+
+  // Función para abrir el modal
+  const handleShowModal = () => {
+    setShowModal(true);
+  };
+
+  // Función para cerrar el modal
+  const handleCloseModal = () => {
+    setShowModal(false);
   };
 
   return (
@@ -155,7 +181,7 @@ function App() {
         <p>Hubo un problema al cargar la información: {error}</p>
       ) : (
         <div>
-          <h3>Selecciona un Crédito</h3>
+          <h3>Envía crédito a tu cuenta de ahorro</h3>
           {creditos.length === 0 ? (
             <p>No tienes créditos activos.</p>
           ) : (
@@ -178,41 +204,89 @@ function App() {
           )}
 
           <h3>Selecciona una Cuenta de Ahorro</h3>
-          {cuentasAhorro.length === 0 ? (
-            <p>No tienes cuentas de ahorro activas.</p>
-          ) : (
-            <select
-              onChange={(e) =>
-                setSelectedCuentaAhorro(
-                  cuentasAhorro.find((cuenta) => cuenta.id == e.target.value)
-                )
-              }
-            >
-              <option value="">Seleccione una cuenta de ahorro</option>
-              {cuentasAhorro.map((cuenta) => (
-                <option key={cuenta.id} value={cuenta.id}>
-                  Cuenta Ahorro ID: {cuenta.id} - Saldo: ${cuenta.saldo_actual}
-                </option>
-              ))}
+          {cuentaAhorro ? (
+            <select onChange={() => setSelectedCuentaAhorro(cuentaAhorro)}>
+              <option value={cuentaAhorro.id}>
+                Cuenta Ahorro ID: {cuentaAhorro.id} - Saldo: $
+                {cuentaAhorro.saldo_actual}
+              </option>
             </select>
+          ) : (
+            <p>No tienes cuentas de ahorro activas.</p>
           )}
 
           <button
             className="btn btn-primary"
             onClick={transferirMonto}
-            disabled={isCopying || !selectedCredito || !selectedCuentaAhorro}
+            disabled={isCopying || !selectedCredito || !cuentaAhorro}
           >
             {isCopying
               ? "Transfiriendo..."
               : "Transferir Monto a Cuenta de Ahorro"}
           </button>
+
+          <button
+            className="btn btn-secondary"
+            onClick={handleShowModal}
+            disabled={creditos.length === 0}
+          >
+            Ver Créditos
+          </button>
+
+          {/* Modal para mostrar créditos */}
+          {showModal && (
+            <div className="modal fade show" style={{ display: "block" }}>
+              <div className="modal-dialog">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5 className="modal-title">Créditos</h5>
+                    <button
+                      type="button"
+                      className="close"
+                      onClick={handleCloseModal}
+                    >
+                      &times;
+                    </button>
+                  </div>
+                  <div className="modal-body">
+                    <table className="table">
+                      <thead>
+                        <tr>
+                          <th>ID</th>
+                          <th>Monto</th>
+                          <th>Estado</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {creditos.map((credito) => (
+                          <tr key={credito.id}>
+                            <td>{credito.id}</td>
+                            <td>${credito.monto}</td>
+                            <td>{credito.estado}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="modal-footer">
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={handleCloseModal}
+                    >
+                      Cerrar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
   );
 }
 
-// Inicializar el renderizado en el DOM
 const rootElement = document.getElementById("root");
 const root = createRoot(rootElement);
 root.render(<App />);

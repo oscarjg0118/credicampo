@@ -31,10 +31,12 @@ if (!$userId || !filter_var($userId, FILTER_VALIDATE_INT)) {
     exit();
 }
 
-// Consultar las cuentas de ahorro del usuario
-$sql = "SELECT id, usuario_id, tipo_movimiento, valor_movimiento, saldo_actual, fecha_movimiento 
-        FROM ctaahorro 
-        WHERE usuario_id = ?";
+// Consultar la cuenta de ahorro más reciente del usuario
+$sql = "SELECT id, usuario_id, tipo_movimiento, valor_movimiento, saldo_actual, fecha_movimiento
+        FROM ctaahorro
+        WHERE usuario_id = ?
+        ORDER BY fecha_movimiento DESC
+        LIMIT 1";
 $stmt = $conn->prepare($sql);
 if (!$stmt) {
     echo json_encode(["success" => false, "message" => "Error en la preparación de la consulta: " . $conn->error]);
@@ -45,17 +47,11 @@ $stmt->bind_param("i", $userId);
 $stmt->execute();
 $result = $stmt->get_result();
 
-// Crear un array para almacenar las cuentas de ahorro
-$cuentas = [];
-
-while ($row = $result->fetch_assoc()) {
-    $cuentas[] = $row;
-}
-
 // Verificar si hay resultados
-if (count($cuentas) > 0) {
-    // Devolver los resultados en formato JSON
-    echo json_encode($cuentas);
+if ($result->num_rows > 0) {
+    // Devolver el resultado en formato JSON
+    $cuenta = $result->fetch_assoc();
+    echo json_encode($cuenta);
 } else {
     echo json_encode(["success" => false, "message" => "No se encontraron cuentas de ahorro para este usuario"]);
     http_response_code(404);

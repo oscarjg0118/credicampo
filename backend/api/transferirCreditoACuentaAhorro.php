@@ -1,7 +1,6 @@
 <?php
 // Permitir acceso desde cualquier origen
 header("Access-Control-Allow-Origin: http://localhost:3000");
-header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json; charset=UTF-8");
@@ -11,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-// Credenciales de la base de datos
+// Configuración de la conexión a la base de datos
 $servername = "localhost:3307";
 $username = "root";
 $password = "";
@@ -66,12 +65,17 @@ if ($row['estado'] === 'desembolsado') {
 $conn->begin_transaction();
 
 try {
-    // 1. Obtener el saldo actual de la cuenta de ahorro
-    $sql_get_saldo = "SELECT saldo_actual FROM ctaahorro WHERE id = ?";
+    // 1. Obtener el saldo actual de la cuenta de ahorro (último registro)
+    $sql_get_saldo = "SELECT saldo_actual FROM ctaahorro WHERE id = ? ORDER BY fecha_movimiento ASC LIMIT 1";
     $stmt_get_saldo = $conn->prepare($sql_get_saldo);
     $stmt_get_saldo->bind_param("i", $id_cuenta_ahorro);
     $stmt_get_saldo->execute();
     $result_saldo = $stmt_get_saldo->get_result();
+
+    if ($result_saldo->num_rows === 0) {
+        throw new Exception("Cuenta de ahorro no encontrada.");
+    }
+
     $row_saldo = $result_saldo->fetch_assoc();
     $saldo_actual = $row_saldo['saldo_actual'];
 
@@ -83,18 +87,25 @@ try {
     $stmt1->bind_param("idd", $usuario_id, $monto_transferencia, $nuevo_saldo);
     $stmt1->execute();
 
+    // Obtener el último id insertado en ctaahorro
+    $ultimo_id_ctaahorro = $conn->insert_id;
+
     // 3. Actualizar el estado de la solicitud de crédito a "desembolsado"
     $sql2 = "UPDATE solicitudes_credito SET estado = 'desembolsado', saldo_capital = 0 WHERE id = ?";
     $stmt2 = $conn->prepare($sql2);
     $stmt2->bind_param("i", $id_credito);
     $stmt2->execute();
 
-    // Si ambas consultas son exitosas, confirmar la transacción
+    // Confirmar la transacción si ambas operaciones son exitosas
     $conn->commit();
 
-    echo json_encode(["success" => true, "message" => "Transferencia realizada con éxito"]);
+    echo json_encode([
+        "success" => true,
+        "message" => "Transferencia realizada con éxito",
+        "ultimo_id_ctaahorro" => $ultimo_id_ctaahorro
+    ]);
 } catch (Exception $e) {
-    // Si hay algún error, revertir la transacción
+    // Revertir la transacción si hay algún error
     $conn->rollback();
     echo json_encode(["success" => false, "message" => "Error al realizar la transferencia: " . $e->getMessage()]);
     http_response_code(500);

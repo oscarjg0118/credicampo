@@ -25,7 +25,8 @@ if (!$userId) {
     exit();
 }
 
-$sql = "SELECT id, monto, plazo, interes_mensual, cuota_mensual FROM solicitudes_credito WHERE usuario_id = ?";
+// Ajusta la consulta para incluir el estado
+$sql = "SELECT id, monto, estado, plazo, interes_mensual, cuota_mensual FROM solicitudes_credito WHERE usuario_id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userId);
 $stmt->execute();
