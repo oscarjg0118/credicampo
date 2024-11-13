@@ -12,18 +12,19 @@
         <img src="img/Logo-CrediCampo2-2.png" alt="Logo">
         <nav>
             <ul>
-                <!-- <li><a href="index.html">Inicio</a></li> -->
                 <li><a href="ctaahorro.html">Mis Cuentas Ahorro</a></li>
                 <li><a href="solicitacredito.html">Solicitud de Credito</a></li>
                 <li><a href="miscreditos.html">Miscreditos</a></li>
-                <li><a href="pagos.html">Pagos</a></li>                
+                <li><a href="pagos.html">Pagos</a></li>
+                <li><a href="#nosotros">Nosotros</a></li>
+                <li><a href="#ayuda">Ayuda</a></li>                
             </ul>
         </nav>
     </header>
 
     <main class="botones-ppal">
         <div id="userInfo">
-            <!-- Aquí se mostrará el nombre del usuario -->
+        
         </div>
         <button type="button" id="logoutButton">Salir del sistema</button>
         <!-- <img src="img/banner-ppal1.jpg" alt="imagen banner ppal" class="banner-img"> -->
@@ -35,7 +36,7 @@
         <script src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
         <script src="bundle.js"></script> <!-- Añadir esta línea para cargar el bundle -->
         <script>
-            // Recuperar el email del usuario desde sessionStorage
+            
             const userEmail = sessionStorage.getItem("userEmail");
             if (userEmail) {
                 document.getElementById("userInfo").innerText = "Bienvenido, " + userEmail;

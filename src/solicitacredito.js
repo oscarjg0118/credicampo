@@ -6,7 +6,7 @@ function SolicitudCredito() {
   const [monto, setMonto] = useState(0);
   const [ingreso, setIngreso] = useState(0);
   const [plazo, setPlazo] = useState(12);
-  const [interesMensual, setInteresMensual] = useState(0.5); // Interés mensual del 0.5% por defecto
+  const [interesMensual, setInteresMensual] = useState(0.1); // Interés mensual del 0.5% por defecto
   const [cuotaMensual, setCuotaMensual] = useState(null);
   const [resultado, setResultado] = useState("");
   const [usuarioId, setUsuarioId] = useState(null);

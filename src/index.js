@@ -12,5 +12,4 @@ function App() {
   );
 }
 
-// Renderizamos el componente principal en el elemento con id "root"
 ReactDOM.render(<App />, document.getElementById("root"));

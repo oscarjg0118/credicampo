@@ -13,7 +13,8 @@
         <nav>
             <ul>
                 <li><a href="ppalusuario.html">Inicio</a></li>
-                <li><a href="transferencias.html">Transferencias</a></li>
+                <li><a href="solicitacredito.html">Solicitud de Credito</a></li>
+                <li><a href="miscreditos.html">Miscreditos</a></li>
                 <li><a href="pagos.html">Pagos</a></li>
             </ul>
         </nav>
@@ -24,6 +25,22 @@
             <!-- Aquí se mostrará el nombre del usuario -->
         </div>
         <button type="button" id="logoutButton">Salir del sistema</button>
+        <script>
+            // Recuperar el email del usuario desde sessionStorage
+            const userEmail = sessionStorage.getItem("userEmail");
+            if (userEmail) {
+                document.getElementById("userInfo").innerText = "Bienvenido, " + userEmail;
+            } else {
+                document.getElementById("userInfo").innerText = "No se ha iniciado sesión.";
+            }
+
+            document.getElementById("logoutButton").addEventListener("click", function() {
+                // Aquí puedes añadir funcionalidad para cerrar la sesión, como eliminar cookies o tokens de sesión
+                sessionStorage.removeItem("userEmail"); // Eliminar el email del sessionStorage
+                alert("Sesión cerrada exitosamente.");
+                window.location.href = "ingreso.html"; // Redirigir al usuario a la página de inicio de sesión
+            });
+        </script>
     </main>
 
     <!-- React renderiza el formulario de cuentas de ahorro aquí -->

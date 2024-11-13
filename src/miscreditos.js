@@ -4,9 +4,8 @@ import "/public/styles.scss";
 
 function App() {
   const [creditos, setCreditos] = useState([]);
-  const [cuentaAhorro, setCuentaAhorro] = useState(null); // Cambiado a solo una cuenta de ahorro
+  const [cuentaAhorro, setCuentaAhorro] = useState(null);
   const [selectedCredito, setSelectedCredito] = useState(null);
-  const [selectedCuentaAhorro, setSelectedCuentaAhorro] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isCopying, setIsCopying] = useState(false);
@@ -20,32 +19,9 @@ function App() {
     return null;
   }
 
-  // Fetch para obtener los créditos
+  // Fetch para obtener los créditos desde la tabla creditos
   useEffect(() => {
-    fetch(
-      `http://localhost/backend/api/obtenerSolicitudesCredito.php?userId=${userId}`
-    )
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Error HTTP: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setCreditos(Array.isArray(data) ? data : []);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        setError(error.message);
-        setIsLoading(false);
-      });
-  }, [userId]);
-
-  // Fetch para obtener los créditos
-  useEffect(() => {
-    fetch(
-      `http://localhost/backend/api/obtenerSolicitudesCredito.php?userId=${userId}`
-    )
+    fetch(`http://localhost/backend/api/obtenerCreditos.php?userId=${userId}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Error HTTP: ${response.status}`);
@@ -64,7 +40,9 @@ function App() {
 
   // Fetch para obtener la cuenta de ahorro más reciente
   useEffect(() => {
-    fetch(`http://localhost/backend/api/obtenerctaahorro.php?userId=${userId}`)
+    fetch(
+      `http://localhost/backend/api/obtenerctaahorroCredit.php?userId=${userId}`
+    )
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Error HTTP: ${response.status}`);
@@ -72,7 +50,7 @@ function App() {
         return response.json();
       })
       .then((data) => {
-        setCuentaAhorro(data || null); // Guarda solo la última cuenta de ahorro obtenida
+        setCuentaAhorro(data || null);
         setIsLoading(false);
       })
       .catch((error) => {
@@ -81,7 +59,6 @@ function App() {
       });
   }, [userId]);
 
-  // Función para copiar el monto del crédito a la cuenta de ahorro
   const transferirMonto = () => {
     if (!selectedCredito || !cuentaAhorro) {
       alert("Debe seleccionar un crédito y una cuenta de ahorro.");
@@ -94,7 +71,7 @@ function App() {
     }
 
     const { monto, id: id_credito } = selectedCredito;
-    const { id: id_cuenta_ahorro, saldo_actual } = cuentaAhorro;
+    const { id: id_cuenta_ahorro } = cuentaAhorro;
 
     if (
       confirm(
@@ -153,12 +130,10 @@ function App() {
     }
   };
 
-  // Función para abrir el modal
   const handleShowModal = () => {
     setShowModal(true);
   };
 
-  // Función para cerrar el modal
   const handleCloseModal = () => {
     setShowModal(false);
   };
@@ -253,16 +228,24 @@ function App() {
                       <thead>
                         <tr>
                           <th>ID</th>
-                          <th>Monto</th>
-                          <th>Estado</th>
+                          <th>Solicitud ID</th>
+                          <th>Fecha</th>
+                          <th>Valor Transacción</th>
+                          <th>Abono Capital</th>
+                          <th>Abono Intereses</th>
+                          <th>Saldo Capital</th>
                         </tr>
                       </thead>
                       <tbody>
                         {creditos.map((credito) => (
                           <tr key={credito.id}>
                             <td>{credito.id}</td>
-                            <td>${credito.monto}</td>
-                            <td>{credito.estado}</td>
+                            <td>{credito.solicitud_id}</td>
+                            <td>{credito.fecha}</td>
+                            <td>${credito.valor_transaccion}</td>
+                            <td>${credito.abono_capital}</td>
+                            <td>${credito.abono_intereses}</td>
+                            <td>${credito.saldo_capital}</td>
                           </tr>
                         ))}
                       </tbody>
