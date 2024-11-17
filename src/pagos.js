@@ -16,7 +16,7 @@ function Pagos() {
     }
 
     fetch(
-      `http://localhost/backend/api/obtenerSolicitudesCredito.php?userId=${userId}`
+      `http://localhost/backend/api/obtenerSolicitCreditpagos.php?userId=${userId}`
     )
       .then((response) => response.json())
       .then((data) => {
@@ -84,7 +84,7 @@ function Pagos() {
 
       const data = {
         solicitud_id: obligacionId,
-        fecha: new Date().toISOString(), // Fecha actual
+        fecha: new Date().toISOString(),
         valor_transaccion: valor,
         abono_capital: abonoCapital,
         abono_intereses: abonoIntereses,

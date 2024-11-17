@@ -1,10 +1,11 @@
 <?php
-// Permitir acceso desde cualquier origen
+// Permitir acceso desde un origen específico (cambiar según sea necesario)
 header("Access-Control-Allow-Origin: http://localhost:3000");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json; charset=UTF-8");
 
+// Responder correctamente a las solicitudes OPTIONS
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
@@ -29,8 +30,9 @@ if ($conn->connect_error) {
 // Obtener los datos enviados por el cuerpo de la solicitud
 $data = json_decode(file_get_contents("php://input"));
 
+// Validar si los parámetros requeridos están presentes
 if (!isset($data->usuario_id) || !isset($data->id_cuenta_ahorro) || !isset($data->monto_transferencia) || !isset($data->id_credito)) {
-    echo json_encode(["success" => false, "message" => "Datos incompletos"]);
+    echo json_encode(["success" => false, "message" => "Datos incompletos."]);
     http_response_code(400);
     exit();
 }
@@ -41,6 +43,13 @@ $id_cuenta_ahorro = $data->id_cuenta_ahorro;
 $monto_transferencia = $data->monto_transferencia;
 $id_credito = $data->id_credito;
 
+// Validar que el monto de la transferencia sea positivo
+if ($monto_transferencia <= 0) {
+    echo json_encode(["success" => false, "message" => "El monto de la transferencia debe ser mayor a cero."]);
+    http_response_code(400);
+    exit();
+}
+
 // Verificar el estado del crédito
 $sql_check = "SELECT estado FROM solicitudes_credito WHERE id = ?";
 $stmt_check = $conn->prepare($sql_check);
@@ -49,14 +58,14 @@ $stmt_check->execute();
 $result_check = $stmt_check->get_result();
 
 if ($result_check->num_rows === 0) {
-    echo json_encode(["success" => false, "message" => "Crédito no encontrado"]);
+    echo json_encode(["success" => false, "message" => "Crédito no encontrado."]);
     http_response_code(404);
     exit();
 }
 
 $row = $result_check->fetch_assoc();
 if ($row['estado'] === 'desembolsado') {
-    echo json_encode(["success" => false, "message" => "El crédito ya ha sido desembolsado"]);
+    echo json_encode(["success" => false, "message" => "El crédito ya ha sido desembolsado."]);
     http_response_code(400);
     exit();
 }
@@ -66,7 +75,7 @@ $conn->begin_transaction();
 
 try {
     // 1. Obtener el saldo actual de la cuenta de ahorro (último registro)
-    $sql_get_saldo = "SELECT saldo_actual FROM ctaahorro WHERE id = ? ORDER BY fecha_movimiento ASC LIMIT 1";
+    $sql_get_saldo = "SELECT saldo_actual FROM ctaahorro WHERE id = ? ORDER BY fecha_movimiento DESC LIMIT 1";
     $stmt_get_saldo = $conn->prepare($sql_get_saldo);
     $stmt_get_saldo->bind_param("i", $id_cuenta_ahorro);
     $stmt_get_saldo->execute();
@@ -101,7 +110,7 @@ try {
 
     echo json_encode([
         "success" => true,
-        "message" => "Transferencia realizada con éxito",
+        "message" => "Transferencia realizada con éxito.",
         "ultimo_id_ctaahorro" => $ultimo_id_ctaahorro
     ]);
 } catch (Exception $e) {

@@ -4,6 +4,7 @@ import "/public/styles.scss";
 
 function App() {
   const [creditos, setCreditos] = useState([]);
+  const [creditosCreados, setCreditosCreados] = useState([]);
   const [cuentaAhorro, setCuentaAhorro] = useState(null);
   const [selectedCredito, setSelectedCredito] = useState(null);
   const [error, setError] = useState(null);
@@ -19,47 +20,78 @@ function App() {
     return null;
   }
 
-  // Fetch para obtener los créditos desde la tabla creditos
-  useEffect(() => {
-    fetch(`http://localhost/backend/api/obtenerCreditos.php?userId=${userId}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Error HTTP: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setCreditos(Array.isArray(data) ? data : []);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        setError(error.message);
-        setIsLoading(false);
-      });
-  }, [userId]);
+  // Función para obtener las solicitudes de crédito (modal)
+  const obtenerSolicitudesCredito = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost/backend/api/obtenerSolicitudesCredit.php?userId=${userId}`
+      );
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+      const data = await response.json();
+      setCreditos(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Error al cargar las solicitudes de crédito:", error);
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  // Fetch para obtener la cuenta de ahorro más reciente
-  useEffect(() => {
-    fetch(
-      `http://localhost/backend/api/obtenerctaahorroCredit.php?userId=${userId}`
-    )
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Error HTTP: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setCuentaAhorro(data || null);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        setError(error.message);
-        setIsLoading(false);
-      });
-  }, [userId]);
+  // Función para obtener solicitudes de crédito en estado "creado"
+  const obtenerSolicitudesCreditoCreadas = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost/backend/api/obtenerSolictCredCreado.php?userId=${userId}`
+      );
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log("Datos recibidos del API:", data); // Verificación de datos recibidos
 
-  const transferirMonto = () => {
+      // Verificar y extraer el array de datos
+      if (data && Array.isArray(data.data)) {
+        setCreditosCreados(data.data);
+        console.log(
+          "Estado creditosCreados después de la actualización:",
+          data.data
+        );
+      } else {
+        setCreditosCreados([]);
+        console.error("Los datos recibidos no son un array:", data);
+      }
+
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error al cargar créditos creados:", error);
+      setError(error.message);
+      setIsLoading(false);
+    }
+  };
+
+  // Función para obtener la cuenta de ahorro
+  const obtenerCuentaAhorro = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost/backend/api/obtenerctaahorroCredit.php?userId=${userId}`
+      );
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+      const data = await response.json();
+      setCuentaAhorro(data || null);
+    } catch (error) {
+      console.error("Error al cargar cuenta de ahorro:", error);
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Función para transferir monto a la cuenta de ahorro
+  const transferirMonto = async () => {
     if (!selectedCredito || !cuentaAhorro) {
       alert("Debe seleccionar un crédito y una cuenta de ahorro.");
       return;
@@ -79,64 +111,69 @@ function App() {
       )
     ) {
       setIsCopying(true);
-
-      fetch("http://localhost/backend/api/transferirCreditoACuentaAhorro.php", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          usuario_id: userId,
-          id_cuenta_ahorro: id_cuenta_ahorro,
-          monto_transferencia: monto,
-          id_credito: id_credito,
-        }),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            return response.json().then((data) => {
-              throw new Error(
-                `Error HTTP: ${response.status}. ${
-                  data?.message || "Ocurrió un error."
-                }`
-              );
-            });
+      try {
+        const response = await fetch(
+          "http://localhost/backend/api/transferirCreditoACuentaAhorro.php",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              usuario_id: userId,
+              id_cuenta_ahorro,
+              monto_transferencia: monto,
+              id_credito,
+            }),
           }
-          return response.json();
-        })
-        .then((data) => {
-          if (data.success) {
-            alert("Monto transferido con éxito a la cuenta de ahorro.");
-            setCreditos((prevCreditos) =>
-              prevCreditos.map((credito) =>
-                credito.id === id_credito
-                  ? { ...credito, estado: "desembolsado" }
-                  : credito
-              )
-            );
-            setCuentaAhorro((prevCuenta) => ({
-              ...prevCuenta,
-              saldo_actual: prevCuenta.saldo_actual + monto,
-            }));
-          } else {
-            alert("Error al transferir el monto: " + data.message);
-          }
-        })
-        .catch((error) => {
-          console.error("Error al transferir el monto:", error);
-          alert("Hubo un problema al transferir el monto.");
-        })
-        .finally(() => setIsCopying(false));
+        );
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(
+            `Error HTTP: ${response.status}. ${
+              data?.message || "Error desconocido."
+            }`
+          );
+        }
+        const data = await response.json();
+        if (data.success) {
+          alert("Monto transferido con éxito a la cuenta de ahorro.");
+          actualizarEstados(id_credito, monto);
+        } else {
+          alert("Error al transferir el monto: " + data.message);
+        }
+      } catch (error) {
+        console.error("Error al transferir el monto:", error);
+        alert("Hubo un problema al transferir el monto.");
+      } finally {
+        setIsCopying(false);
+      }
     }
   };
 
-  const handleShowModal = () => {
-    setShowModal(true);
+  // Actualiza los estados de créditos y cuenta
+  const actualizarEstados = (id_credito, monto) => {
+    setCreditos((prevCreditos) =>
+      prevCreditos.map((credito) =>
+        credito.id === id_credito
+          ? { ...credito, estado: "desembolsado" }
+          : credito
+      )
+    );
+    setCuentaAhorro((prevCuenta) => ({
+      ...prevCuenta,
+      saldo_actual: prevCuenta.saldo_actual + monto,
+    }));
   };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
-  };
+  useEffect(() => {
+    obtenerSolicitudesCredito();
+    obtenerSolicitudesCreditoCreadas();
+    obtenerCuentaAhorro();
+  }, [userId]);
+
+  const handleShowModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
 
   return (
     <div>
@@ -157,30 +194,24 @@ function App() {
       ) : (
         <div>
           <h3>Envía crédito a tu cuenta de ahorro</h3>
-          {creditos.length === 0 ? (
-            <p>No tienes créditos activos.</p>
-          ) : (
-            <select
-              onChange={(e) =>
-                setSelectedCredito(
-                  creditos.find((credito) => credito.id == e.target.value)
-                )
-              }
-            >
-              <option value="">Seleccione un crédito</option>
-              {creditos
-                .filter((credito) => credito.estado !== "desembolsado")
-                .map((credito) => (
-                  <option key={credito.id} value={credito.id}>
-                    Crédito ID: {credito.id} - Monto: ${credito.monto}
-                  </option>
-                ))}
-            </select>
-          )}
+          <select
+            onChange={(e) =>
+              setSelectedCredito(
+                creditosCreados.find((credito) => credito.id == e.target.value)
+              )
+            }
+          >
+            <option value="">Seleccione un crédito</option>
+            {creditosCreados.map((credito) => (
+              <option key={credito.id} value={credito.id}>
+                Crédito ID: {credito.id} - Monto: ${credito.monto}
+              </option>
+            ))}
+          </select>
 
           <h3>Selecciona una Cuenta de Ahorro</h3>
           {cuentaAhorro ? (
-            <select onChange={() => setSelectedCuentaAhorro(cuentaAhorro)}>
+            <select>
               <option value={cuentaAhorro.id}>
                 Cuenta Ahorro ID: {cuentaAhorro.id} - Saldo: $
                 {cuentaAhorro.saldo_actual}
@@ -208,13 +239,12 @@ function App() {
             Ver Créditos
           </button>
 
-          {/* Modal para mostrar créditos */}
           {showModal && (
             <div className="modal fade show" style={{ display: "block" }}>
               <div className="modal-dialog">
                 <div className="modal-content">
                   <div className="modal-header">
-                    <h5 className="modal-title">Créditos</h5>
+                    <h5 className="modal-title">Detalles de Créditos</h5>
                     <button
                       type="button"
                       className="close"
@@ -227,25 +257,19 @@ function App() {
                     <table className="table">
                       <thead>
                         <tr>
-                          <th>ID</th>
-                          <th>Solicitud ID</th>
-                          <th>Fecha</th>
-                          <th>Valor Transacción</th>
-                          <th>Abono Capital</th>
-                          <th>Abono Intereses</th>
-                          <th>Saldo Capital</th>
+                          <th>Monto</th>
+                          <th>Plazo</th>
+                          <th>Interés Mensual</th>
+                          <th>Estado</th>
                         </tr>
                       </thead>
                       <tbody>
                         {creditos.map((credito) => (
                           <tr key={credito.id}>
-                            <td>{credito.id}</td>
-                            <td>{credito.solicitud_id}</td>
-                            <td>{credito.fecha}</td>
-                            <td>${credito.valor_transaccion}</td>
-                            <td>${credito.abono_capital}</td>
-                            <td>${credito.abono_intereses}</td>
-                            <td>${credito.saldo_capital}</td>
+                            <td>${credito.monto}</td>
+                            <td>{credito.plazo} meses</td>
+                            <td>{credito.interes_mensual}%</td>
+                            <td>{credito.estado}</td>
                           </tr>
                         ))}
                       </tbody>
